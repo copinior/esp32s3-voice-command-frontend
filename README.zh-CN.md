@@ -2,38 +2,26 @@
 
 [English README](README.md)
 
-这是一个基于 ESP32-S3 的离线语音命令前端项目，负责完成唤醒词检测、命令词识别、本地 UI 状态反馈，以及通过 ESP-NOW 将命令下发到桥接节点或后端控制器。
+此项目基于 ESP32-S3 的离线语音命令前端项目，负责完成唤醒词检测、命令词识别、本地 UI 状态反馈，以及通过 ESP-NOW 将命令发送到桥接节点或后端控制器。
 
 ## 项目定位
 
-这个仓库聚焦“语音识别前端”职责：
+项目意在实现嵌入式语音命令系统中的前端部分：
 
 - 在 ESP32-S3 本地完成离线语音识别
-- 通过 LVGL 提供实时状态显示
+- 通过 LVGL 提供运行状态显示
 - 通过 ESP-NOW 向外发送控制命令
 - 配合 ESP8266 桥接固件输出 TTL 串口协议
 
-执行端控制逻辑，例如电机闭环、状态机、安全约束等，不在本仓库中实现，更适合放在独立的后端控制器仓库中维护。
+执行端控制逻辑在另外的项目中实现。
 
-## 主要功能
+## 运行职责
 
-- 唤醒词 + 命令词识别链路
-- 本地命令与远端命令统一调度
-- 基于 LVGL 的运行状态监控界面
-- ESP-NOW 发送、接收、心跳机制
-- ESP8266 桥接固件，用于无线到串口的协议转发
-
-## 系统链路
-
-```text
-Microphone / Codec
-    -> hardware_driver
-    -> AFE / WakeNet / MultiNet
-    -> command_dispatch_task
-    -> lvgl_ui
-    -> espnow_bridge
-    -> ESP8266 bridge or backend controller
-```
+- 完成唤醒词与命令词识别
+- 统一调度本地命令和远端命令事件
+- 显示命令来源、置信度、RSSI 和链路状态
+- 处理 ESP-NOW 发送、接收和心跳
+- 支持 ESP8266 无线到串口桥接
 
 ## 仓库结构
 
@@ -43,18 +31,29 @@ components/espnow_bridge/           ESP-NOW 通信封装
 components/hardware_driver/         板级 BSP 与硬件抽象
 components/lvgl_ui/                 LVGL 监控界面
 tools/esp8266_esnow_slave_bridge/   ESP8266 桥接固件
-docs/                               架构、协议与集成说明
+docs/                               补充项目说明
 ```
 
-当前主运行链路依赖的核心模块只有：
+主运行链路依赖的核心模块为：
 
 - `hardware_driver`
 - `espnow_bridge`
 - `lvgl_ui`
 
+## 处理流程
+
+主流程为：
+
+1. 通过板级驱动获取音频数据
+2. 由 AFE / WakeNet / MultiNet 完成唤醒与命令识别
+3. 识别结果进入统一命令调度路径
+4. 将命令状态反馈到 LVGL 界面
+5. 按需通过 ESP-NOW 向外发送命令
+6. 由桥接节点或后端控制器接收并继续处理
+
 ## 命令集
 
-当前工程配置中的有效命令 ID 为 `0..15`：
+工程配置中的有效命令 ID 为 `0..15`。其中命令 `0` 和 `1` 预留为灯光控制命令，当前后端执行逻辑尚未接入。
 
 | command_id | 命令词 | 语义 |
 | --- | --- | --- |
@@ -83,19 +82,10 @@ docs/                               架构、协议与集成说明
 
 ## 配置说明
 
-默认 ESP-NOW 目标 MAC 当前设置为安全占位值：
+默认 ESP-NOW 目标 MAC 设置为占位值：
 
 ```text
 CONFIG_APP_ESPNOW_DEFAULT_DEST_MAC="FF:FF:FF:FF:FF:FF"
 ```
 
-在实际联调或部署前，应将其替换为目标桥接节点或目标对端设备的真实 MAC 地址。
-
-## 文档入口
-
-- [项目结构说明](PROJECT_STRUCTURE.md)
-- [系统架构](docs/architecture.md)
-- [通信协议](docs/protocol.md)
-- [系统集成](docs/integration.md)
-- [显示初始化记录](docs/display_init_lichuang_dev_step_by_step.md)
-- [ESP8266 桥接固件说明](tools/esp8266_esnow_slave_bridge/README.md)
+实际联调或部署时替换为目标桥接节点或目标对端设备的真实 MAC 地址。
