@@ -1,9 +1,6 @@
 /* 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
+ * Public declarations for command feedback actions used by the
+ * ESP32-S3 voice command frontend application.
 */
 #ifndef _SPEECH_COMMANDS_ACTION_H_
 #define _SPEECH_COMMANDS_ACTION_H_
