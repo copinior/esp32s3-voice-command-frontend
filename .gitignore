@@ -1,0 +1,19 @@
+# ESP-IDF build outputs
+build/
+managed_components/
+
+# Local configuration and generated state
+sdkconfig
+sdkconfig.old
+*.map
+*.bin
+*.elf
+
+# IDE and local tooling
+.vscode/
+.claude/
+.idea/
+
+# OS files
+Thumbs.db
+.DS_Store

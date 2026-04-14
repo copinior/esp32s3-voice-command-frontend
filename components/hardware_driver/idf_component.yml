@@ -1,0 +1,3 @@
+dependencies:
+  espressif/es7210: "^1.0.1~1"
+  espressif/es8311: "^1.0.0~1"

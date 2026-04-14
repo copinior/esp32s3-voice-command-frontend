@@ -1,0 +1,11 @@
+menu "Application Settings"
+
+config APP_ESPNOW_DEFAULT_DEST_MAC
+    string "Default ESP-NOW destination MAC"
+    default "FF:FF:FF:FF:FF:FF"
+    help
+        Default destination MAC used when the ESP32 frontend forwards
+        recognized commands over ESP-NOW. Replace this with the MAC address
+        of your ESP8266 bridge or target peer before deployment.
+
+endmenu

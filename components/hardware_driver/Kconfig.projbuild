@@ -1,0 +1,9 @@
+menu "Audio Media HAL"
+
+config ESP_CUSTOM_BOARD
+    bool "Custom ESP32-S3 Audio Board"
+    depends on IDF_TARGET_ESP32S3
+    default y
+    help
+        Enable customn ESP32-S3 audio board support.    
+endmenu
