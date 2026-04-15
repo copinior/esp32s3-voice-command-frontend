@@ -37,7 +37,7 @@ static const char *TAG_MAIN = "MAIN";
 #define APP_ESPNOW_CMD_MSG_TYPE          (0x01)
 #define APP_ESPNOW_HEARTBEAT_MSG_TYPE    (0x02)
 #define APP_ESPNOW_HEARTBEAT_INTERVAL_MS (5000)
-#define APP_REMOTE_CONF_THRESHOLD_Q15    (16384U)
+#define APP_REMOTE_CONF_THRESHOLD_Q15    (7800U)
 #define APP_COMMAND_ID_MIN               (0)
 #define APP_COMMAND_ID_MAX               (15)
 #define APP_COMMAND_COUNT                (16)
@@ -79,8 +79,22 @@ static QueueHandle_t s_cmd_queue = NULL;
 static QueueHandle_t s_audio_queue = NULL;
 
 static const uint16_t APP_CMD_THR_Q15[APP_COMMAND_COUNT] = {
-    8000, 8000, 7000, 7500, 7000, 8000, 14000, 17000,
-    5000, 4500, 10000, 11000, 12000, 9000, 5500, 4500
+    7000,  /* 0: da kai che deng */
+    7000,  /* 1: guan bi che deng */
+    6200,  /* 2: jia su */
+    6700,  /* 3: jian su */
+    5200,  /* 4: sha che */
+    7000,  /* 5: ting che */
+    7800,  /* 6: zuo zhuan */
+    7800,  /* 7: you zhuan */
+    4200,  /* 8: zuo diao tou */
+    3800,  /* 9: you diao tou */
+    6200,  /* 10: dao che */
+    7800,  /* 11: wei zhi mo shi */
+    7800,  /* 12: su du mo shi */
+    7800,  /* 13: zhuang tai cha xun */
+    4800,  /* 14: chong qi xi tong */
+    3800   /* 15: chu shi hua */
 };
 
 static inline uint16_t app_get_cmd_threshold_q15(int cmd_id) {

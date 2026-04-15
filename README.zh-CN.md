@@ -62,7 +62,7 @@ docs/                               补充项目说明
 | 2 | `jia su` | 加速 |
 | 3 | `jian su` | 减速 |
 | 4 | `sha che` | 刹车 |
-| 5 | `ting che` | 停止 |
+| 5 | `ting che` | 停车 |
 | 6 | `zuo zhuan` | 左转 |
 | 7 | `you zhuan` | 右转 |
 | 8 | `zuo diao tou` | 左掉头 |

@@ -42,7 +42,8 @@ static constexpr uint8_t TTL_FRAME_VER = 0x01;
 static constexpr size_t TTL_PAYLOAD_LEN = 12;
 
 // TTL forward output configuration.
-// Prefer hardware UART1 (TX only, GPIO2) to save IRAM.
+// Default path keeps using UART0 so existing STM32 wiring does not change.
+// Enable software serial only when you intentionally want a separate TTL port.
 #if TTL_USE_SOFTWARE_SERIAL
 #ifndef D5
 #define D5 14
@@ -54,7 +55,7 @@ static constexpr uint8_t TTL_TX_PIN = D5;
 static constexpr uint8_t TTL_RX_PIN = D6;
 SoftwareSerial g_ttl_serial(TTL_RX_PIN, TTL_TX_PIN);
 #else
-static constexpr uint8_t TTL_TX_PIN = 2;  // GPIO2, UART1 TX
+static constexpr uint8_t TTL_TX_PIN = 1;  // GPIO1, UART0 TX shared with debug
 #endif
 
 static constexpr size_t RX_QUEUE_DEPTH = 8;
@@ -179,9 +180,34 @@ static void write_le32(uint8_t *dst, uint32_t v) {
   dst[3] = static_cast<uint8_t>((v >> 24) & 0xFF);
 }
 
+static void ttl_begin() {
+#if TTL_USE_SOFTWARE_SERIAL
+  g_ttl_serial.begin(TTL_BAUD);
+#endif
+}
+
 static void ttl_write_bytes(const uint8_t *buf, size_t len) {
+  if (buf == nullptr || len == 0) {
+    return;
+  }
+#if TTL_USE_SOFTWARE_SERIAL
+  g_ttl_serial.write(buf, len);
+  g_ttl_serial.flush();
+#else
   Serial.write(buf, len);
   Serial.flush();
+#endif
+}
+
+static void ttl_print_local_sta_mac_once() {
+  uint8_t mac[6] = {0};
+  WiFi.macAddress(mac);
+
+  char line[48];
+  snprintf(line, sizeof(line),
+           "Local STA MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n",
+           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  ttl_write_bytes(reinterpret_cast<const uint8_t *>(line), strlen(line));
 }
 
 static void forward_ttl_frame(const espnow_voice_cmd_t &cmd) {
@@ -290,8 +316,9 @@ static bool setup_espnow_receiver() {
 }
 
 void setup() {
-  Serial.begin(TTL_BAUD, TTL_SERIAL_CFG);
+  Serial.begin(DEBUG_BAUD, DEBUG_SERIAL_CFG);
   Serial.setDebugOutput(false);
+  ttl_begin();
   delay(200);
 
   DBG_PRINTLN("");
@@ -303,8 +330,8 @@ void setup() {
   DBG_PRINTF("TTL(soft): tx_pin=%u rx_pin=%u baud=%lu cfg=8N1\n",
              TTL_TX_PIN, TTL_RX_PIN, static_cast<unsigned long>(TTL_BAUD));
 #else
-  DBG_PRINTF("TTL(hw-uart1): tx_pin=%u baud=%lu cfg=serial_config\n",
-             TTL_TX_PIN, static_cast<unsigned long>(TTL_BAUD));
+  DBG_PRINTF("TTL(uart0): shared with debug baud=%lu cfg=8N1\n",
+             static_cast<unsigned long>(TTL_BAUD));
 #endif
 
   if (!setup_espnow_receiver()) {
@@ -312,6 +339,9 @@ void setup() {
     delay(2000);
     ESP.restart();
   }
+
+  // Call this only when you want to inspect the ESP8266 STA MAC over the active TTL output.
+  // ttl_print_local_sta_mac_once();
 
   DBG_PRINTLN("ESP-NOW receiver ready.");
 }
