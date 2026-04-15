@@ -2,6 +2,10 @@
 
 [中文说明](README.zh-CN.md)
 
+## Demo Video
+
+- Bilibili: https://www.bilibili.com/video/BV165QEBjEX6/
+
 An offline voice-command frontend built on ESP32-S3. The project handles wake-word detection, command recognition, local UI feedback, and command forwarding over ESP-NOW to a bridge node or downstream controller.
 
 ## Overview

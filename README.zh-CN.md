@@ -2,6 +2,10 @@
 
 [English README](README.md)
 
+## 演示视频
+
+- Bilibili: https://www.bilibili.com/video/BV165QEBjEX6/
+
 此项目基于 ESP32-S3 的离线语音命令前端项目，负责完成唤醒词检测、命令词识别、本地 UI 状态反馈，以及通过 ESP-NOW 将命令发送到桥接节点或后端控制器。
 
 ## 项目定位
